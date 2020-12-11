@@ -32,7 +32,7 @@ spec:
     nodePort: 30001
   type: NodePort
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: avinetworks
@@ -41,8 +41,11 @@ spec:
   - host: avinetworks.app.{{ inventory_hostname | regex_replace('master1.','') }}
     http:
       paths:
-      - path: /
+      - pathType: Prefix
+        path: /
         backend:
-          serviceName: avinetworks
-          servicePort: 80
+          service:
+            name: avinetworks
+            port: 
+              number: 80
 

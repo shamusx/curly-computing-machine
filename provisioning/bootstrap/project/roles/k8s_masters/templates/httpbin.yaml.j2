@@ -35,7 +35,7 @@ spec:
     nodePort: 30002
   type: NodePort
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: httpbin
@@ -44,7 +44,10 @@ spec:
   - host: httpbin.app.{{ inventory_hostname | regex_replace('master1.','') }}
     http:
       paths:
-      - path: /
+      - pathType: Prefix
+        path: /
         backend:
-          serviceName: httpbin
-          servicePort: 80
+          service:
+            name: httpbin
+            port:
+              number: 80

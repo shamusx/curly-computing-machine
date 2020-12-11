@@ -1007,7 +1007,7 @@ items:
 kind: List
 metadata: {}
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: sock-shop
@@ -1017,7 +1017,10 @@ spec:
   - host: sock-shop.app.{{ inventory_hostname | regex_replace('master1.','') }}
     http:
       paths:
-      - path: /
+      - pathType: Prefix
+        path: /
         backend:
-          serviceName: sock-shop
-          servicePort: 80
+          service:
+            name: sock-shop
+            port:
+              number: 80
