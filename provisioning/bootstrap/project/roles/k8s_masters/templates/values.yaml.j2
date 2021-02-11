@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: avinetworks/ako
+  repository: projects.registry.vmware.com/ako/ako
   pullPolicy: IfNotPresent
 
 ### This section outlines the generic AKO settings
@@ -17,6 +17,11 @@ AKOSettings:
   disableStaticRouteSync: "false" # If the POD networks are reachable from the Avi SE, set this knob to true.
   clusterName: "{{ inventory_hostname | regex_replace('master1.','') | regex_replace('.lab','') }}" # A unique identifier for the kubernetes cluster, that helps distinguish the objects for this cluster in the avi controller. // MUST-EDIT
   cniPlugin: "" # Set the string if your CNI is calico or openshift. enum: calico|canal|flannel|openshift 
+  #NamespaceSelector contains label key and value used for namespacemigration
+  #Same label has to be present on namespace/s which needs migration/sync to AKO
+  namespaceSelector:
+    labelKey: ''
+    labelValue: ''
 
 ### This section outlines the network settings for virtualservices. 
 NetworkSettings:
@@ -31,6 +36,7 @@ NetworkSettings:
   subnetIP: "{{ hostvars['jumpbox.pod.lab']['Lab_vip_ipam_cidr'].split('/')[0] }}" # Subnet IP of the data network
   subnetPrefix: "{{ hostvars['jumpbox.pod.lab']['Lab_vip_ipam_cidr'].split('/')[1] }}" # Subnet Prefix of the data network
   networkName: "{{ hostvars['jumpbox.pod.lab']['network'] }}" # Network Name of the data network
+  enableRHI: false # This is a cluster wide setting for BGP peering.
   nodeNetworkList:
      - networkName: "{{ hostvars['jumpbox.pod.lab']['network'] }}"
        cidrs:
@@ -49,13 +55,17 @@ L7Settings:
 ### This section outlines all the knobs  used to control Layer 4 loadbalancing settings in AKO.
 L4Settings:
   defaultDomain: "app{{ inventory_hostname | regex_replace('master1','') }}" # If multiple sub-domains are configured in the cloud, use this knob to set the default sub-domain to use for L4 VSes.
+  advancedL4: 'false' # Use this knob to control the settings for the services API usage. Default to not using services APIs: https://github.com/kubernetes-sigs/service-apis
+  autoFQDN: default   # ENUM: default(<svc>.<ns>.<subdomain>), flat (<svc>-<ns>.<subdomain>), "disabled" If the value is disabled then the FQDN generation is disabled.
 
 ### This section outlines settings on the Avi controller that affects AKO's functionality.
 ControllerSettings:
   serviceEngineGroupName: "Default-Group" # Name of the ServiceEngine Group.
   controllerVersion: "{{ result['json']['version']['Version'] }}" # The controller API version
   cloudName: "Default-Cloud" # The configured cloud name on the Avi controller.
-  controllerIP: "{{ hostvars[ inventory_hostname | regex_replace('master1','controller') ]['ip_address'] }}"
+  controllerHost: "{{ hostvars[ inventory_hostname | regex_replace('master1','controller') ]['ip_address'] }}"
+  tenantsPerCluster: 'false' # If set to true, AKO will map each kubernetes cluster uniquely to a tenant in Avi
+  tenantName: admin   # Name of the tenant where all the AKO objects will be created in AVI. // Required only if tenantsPerCluster is set to True
 
 nodePortSelector: # Only applicable if serviceType is NodePort
   key: ""
@@ -72,6 +82,9 @@ resources:
 podSecurityContext: {}
   # fsGroup: 2000
 
+rbac:
+  # Creates the pod security policy if set to true
+  pspEnable: false
 
 avicredentials:
   username: admin

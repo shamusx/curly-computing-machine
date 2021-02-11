@@ -143,7 +143,7 @@
 - name: Add AKO incubator chart repo
   community.kubernetes.helm_repository:
     name: ako
-    repo_url: "https://avinetworks.github.io/avi-helm-charts/charts/stable/ako"
+    repo_url: "https://projects.registry.vmware.com/chartrepo/ako"
   become: false
 
 - name: "Get the controller details"
@@ -174,7 +174,7 @@
   community.kubernetes.helm:
     name: ako
     chart_ref: ako/ako
-    chart_version: 1.2.1
+    chart_version: 1.3.3
     create_namespace: true
     release_namespace: avi-system
     values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
