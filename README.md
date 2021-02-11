@@ -39,10 +39,10 @@ LoadBalancer, Ingress are also provided leveraging NSX Advanced Load Balancer an
    **NOTE**: all the deployment work is suggested to be performed within avitools container: [https://github.com/avinetworks/avitools](https://github.com/avinetworks/avitools)
 
 
- 1. Clone the repository [https://github.com/smarunich/curly-computing-machine](https://github.com/smarunich/curly-computing-machine)
+ 1. Clone the repository [https://github.com/shamusx/curly-computing-machine.git](https://github.com/shamusx/curly-computing-machine.git)
 
 ```
-root@avitools:~# git clone https://github.com/smarunich/curly-computing-machine
+root@avitools:~# git clone https://github.com/shamusx/curly-computing-machine.git
 Cloning into ‘curly-computing-machine'...
 ```
 
